@@ -111,22 +111,22 @@ fi # }}}
 oldIFS=$IFS
 IFS=$'\n'
 
-menu_entries=($(awk 'BEGIN {KERNEL_VERSION="";                            # set variables to empty string
+menu_entries=($(awk 'BEGIN {KERNEL_VERSION="";                                    # set variables to empty string
             VMLINUX="";
             KERNEL_ARGS="";
             INITRD=""
             }
-    /menuentry.*+{/,/}/ {                                                 # range from "menuentry ..." to "}"
+    /menuentry.*+{/,/}/ {                                                         # range from "menuentry ..." to "}"
     if ($0 ~ /menuentry/) {
       for(i=1;i<=NF;++i) {if ($i ~ /\(.*+\)/) 
-        {KERNEL_VERSION=KERNEL_VERSION substr($i,2,length($i)-2) "|"; break}};}  # set kernel version
-    if ($1 ~ /linux16/) {VMLINUX=VMLINUX $2 "|";                          # set kernel to boot
+        {KERNEL_VERSION=KERNEL_VERSION substr($i,2,length($i)-2) "|"; break}};}   # set kernel version
+        if ($1 ~ /linux(16|efi)/) {VMLINUX=VMLINUX $2 "|";                        # set kernel to boot
       ORS=" "; TMP_ARGS=""; for(i=3;i<=NF;++i) TMP_ARGS=TMP_ARGS " " $i;
-      KERNEL_ARGS=KERNEL_ARGS substr(TMP_ARGS,2,length(TMP_ARGS)-1) "|"; ORS=""};                      # set kernel arguments
-    if ($1 ~ /initrd16/) {ORS="\n"; INITRD=INITRD $2 "|"};                # set initrd
+      KERNEL_ARGS=KERNEL_ARGS substr(TMP_ARGS,2,length(TMP_ARGS)-1) "|"; ORS=""}; # set kernel arguments
+    if ($1 ~ /initrd(16|efi)/) {ORS="\n"; INITRD=INITRD $2 "|"};                  # set initrd
     }
-    END {print KERNEL_VERSION "\n" VMLINUX "\n" KERNEL_ARGS "\n" INITRD}  # print variables
-    ' $grub_cfg)) #TODO: use correct grub.cfg
+    END {print KERNEL_VERSION "\n" VMLINUX "\n" KERNEL_ARGS "\n" INITRD}          # print variables
+    ' $grub_cfg)) 
 
 IFS=$oldIFS # }}}
 
