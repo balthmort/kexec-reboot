@@ -113,7 +113,7 @@ menu_entries=($(awk 'BEGIN {KERNEL_VERSION="";                            # set 
     /menuentry.*+{/,/}/ {                                                 # range from "menuentry ..." to "}"
     if ($0 ~ /menuentry/) {
       for(i=1;i<=NF;++i) {if ($i ~ /\(.*+\)/) 
-        {KERNEL_VERSION=KERNEL_VERSION substr($i,2,length($i)-2) "|"}};}  # set kernel version
+        {KERNEL_VERSION=KERNEL_VERSION substr($i,2,length($i)-2) "|"; break}};}  # set kernel version
     if ($1 ~ /linux16/) {VMLINUX=VMLINUX $2 "|";                          # set kernel to boot
       ORS=" "; TMP_ARGS=""; for(i=3;i<=NF;++i) TMP_ARGS=TMP_ARGS " " $i;
       KERNEL_ARGS=KERNEL_ARGS substr(TMP_ARGS,2,length(TMP_ARGS)-1) "|"; ORS=""};                      # set kernel arguments
