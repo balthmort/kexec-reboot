@@ -96,9 +96,15 @@ $h_flag && usage 0
 
 # Everything we hnow, we know from grub.cfg. All hail our dark lord!TODO: set
 # correct grub.cfg {{{
-[ ! -e /boot/grub2/grub.cfg ] ||
-[ ! -e /boot/grub2.cfg ] ||
-err "Cannout find grub.cfg" # }}}
+if [ -e /boot/grub2/grub.cfg ];then
+  grub_cfg=/boot/grub2/grub.cfg
+elif [ -e /boot/grub2.cfg ];then
+  grub_cfg=/boot/grub2.cfg
+elif [ -e /boot/efi/EFI/centos/grub.cfg ];then
+  grub_cfg=/boot/efi/EFI/centos/grub.cfg
+else
+  err "Cannout find grub.cfg"
+fi # }}}
 
 # Prepare menu and correct params
 # Parse grub.cfg {{{
@@ -120,7 +126,7 @@ menu_entries=($(awk 'BEGIN {KERNEL_VERSION="";                            # set 
     if ($1 ~ /initrd16/) {ORS="\n"; INITRD=INITRD $2 "|"};                # set initrd
     }
     END {print KERNEL_VERSION "\n" VMLINUX "\n" KERNEL_ARGS "\n" INITRD}  # print variables
-    ' /boot/grub2/grub.cfg)) #TODO: use correct grub.cfg
+    ' $grub_cfg)) #TODO: use correct grub.cfg
 
 IFS=$oldIFS # }}}
 
