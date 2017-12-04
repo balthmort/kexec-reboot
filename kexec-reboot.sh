@@ -38,7 +38,7 @@ Options are:
   --present,      -p - reboot into present kernel, default
 EOF
   cecho c "-------------------------------------------"
-  exit $1
+  exit "$1"
 } # }}}
 
 # Error reporting 
@@ -86,12 +86,12 @@ done
 # left side exit status is nonzero. 
 
 # Print invalid options, help message and exit
-[ ! -z $invalid_options ] && err "Invalid options: ${invalid_options[*]}"
+[ ! -z "$invalid_options" ] && err "Invalid options: ${invalid_options[*]}"
 # Print help and exit
 $h_flag && usage 0
 # Ensure that there is only one of interactive or present modes
 #xor $i_flag $p_flag && err "Only one of modes (non/interactive) can be set."
-!($i_flag && $p_flag) || err "Only one or none of modes (non/interactive) can be set."
+! ($i_flag && $p_flag) || err "Only one or none of modes (non/interactive) can be set."
 # }}}
 
 # Everything we hnow, we know from grub.cfg. All hail our dark lord!TODO: set
@@ -142,14 +142,14 @@ IFS=$oldIFS # }}}
 # Load kernel + some confirmations
 load_and_ask(){ # {{{
   cecho y "Loading kernel ${kernel[$1]}"
-  echo kexec -l /boot${vmlinux[$1]} --append=${args[$1]} --initrd=/boot${initrd[$1]}
-  kexec -l /boot${vmlinux[$1]} --append=${args[$1]} --initrd=/boot${initrd[$1]}
+  echo kexec -l "/boot${vmlinux[$1]}" --append="${args[$1]}" --initrd="/boot${initrd[$1]}"
+  kexec -l "/boot${vmlinux[$1]}" --append="${args[$1]}" --initrd="/boot${initrd[$1]}"
   if [ $? -eq 0 ]; then
     cecho g "Kernel loaded"
   else
     err "Unknown error while loading kernel"
   fi 
-  cecho y "Do you want to reboot now? [y/n] \c"; read choice
+  cecho y "Do you want to reboot now? [y/n] \c"; read -r choice
   if [[ $choice == "y" ]]; then
     kexec -e
   elif [[ $choice == "n" ]]; then
@@ -168,12 +168,12 @@ if $i_flag; then
   for (( i=0; i<${#kernel[@]}; i++ )); do
     cecho c "$i: \c";cecho gr "${kernel[$i]}"
   done
-  cecho g "Please choose kernel: \c"; read choice
+  cecho g "Please choose kernel: \c"; read -r choice
   # Make sure the selected number is an integer
   [[ $choice == *[^0-9]* ]] && err "The selected parameter is not a number"
   [[ $choice -gt ${#kernel[@]}-1 ]] && err "You cannot choose param greater than number of kernels"
   cecho p "You have chosen wisely"
-  load_and_ask $choice
+  load_and_ask "$choice"
 else
   cecho y "Non interactive mode"
   load_and_ask 0
